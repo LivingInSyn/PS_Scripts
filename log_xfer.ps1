@@ -4,20 +4,20 @@
 
 #Creating the Secure String File with your password and writing it to a file 
 #------------
-#read-host -assecurestring | convertfrom-securestring | out-file C:\securestring.txt
+#read-host -assecurestring | convertfrom-securestring | out-file C:\pw_file.txt
 #------------
 
-$user = OSD_logger
-$pass = pw_file.txt | convertto-securestring
-$credential = new-object -typename System.Management.Automation.PSCredential -argumentlist $user,$pass
-$network_path = \\cm12-test.testgrove.testad.uconn.edu\dsl\osd\logs
+$user = 'jjm06012admin'
+$pass = get-content 'pw_file.txt' | convertto-securestring
+#$credential = new-object -typename System.Management.Automation.PSCredential -argumentlist $user,$pass
+$credential = New-Object System.Management.Automation.PSCredential ($user,$pass)
+$network_path = '\\cm12-test.testgrove.testad.uconn.edu\dsl\osd\logs'
 
-New PSDrive -Name Logs -PSProvider FileSystem -Root $network_path -Credential $credential
-
-
-$date = Get-Date -Format g
-mkdir Logs:\$date
-
-cp c:\Windows\CCM\logs\* Logs:\$date
+New-PSDrive -Name Logs -PSProvider FileSystem -Root $network_path -Credential $credential
 
 
+$date = Get-Date -UFormat "%y_%m_%d-%H_%M"
+$hostname = hostname 
+$new_dir = "Logs:\"+$hostname+$date
+mkdir $new_dir
+cp c:\Windows\CCM\logs\* $new_dir
